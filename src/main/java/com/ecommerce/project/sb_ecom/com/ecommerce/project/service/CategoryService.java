@@ -1,6 +1,6 @@
-package com.ecommerce.project.sb_ecom.com.ecommerce.project.model;
+package com.ecommerce.project.sb_ecom.com.ecommerce.project.service;
 
-import org.springframework.stereotype.Service;
+import com.ecommerce.project.sb_ecom.com.ecommerce.project.model.Category;
 
 import java.util.List;
 
