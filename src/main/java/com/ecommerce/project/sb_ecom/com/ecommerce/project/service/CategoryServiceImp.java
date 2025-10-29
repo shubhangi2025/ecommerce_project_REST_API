@@ -3,7 +3,10 @@ package com.ecommerce.project.sb_ecom.com.ecommerce.project.service;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.exception.APIException;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.exception.ResourceNotFoundException;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.model.Category;
+import com.ecommerce.project.sb_ecom.com.ecommerce.project.payload.CategoryDTO;
+import com.ecommerce.project.sb_ecom.com.ecommerce.project.payload.CategoryResponse;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.repositories.CategoryRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImp implements CategoryService{
@@ -20,15 +24,24 @@ public class CategoryServiceImp implements CategoryService{
     @Autowired
     private CategoryRepository repository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     private List<Category> categories = new ArrayList<>();
 
     @Override
-    public List<Category> getAllCategories() {
+    public CategoryResponse getAllCategories() {
         List<Category> categoryList = repository.findAll();
         if(categoryList.isEmpty())
             throw new APIException("No categories available");
-        return categoryList;
 
+        List<CategoryDTO> categoryDTOs = categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .toList();
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categoryDTOs);
+
+        return categoryResponse;
     }
 
     @Override
