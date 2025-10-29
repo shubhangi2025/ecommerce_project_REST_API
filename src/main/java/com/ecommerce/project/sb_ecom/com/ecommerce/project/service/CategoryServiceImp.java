@@ -1,5 +1,7 @@
 package com.ecommerce.project.sb_ecom.com.ecommerce.project.service;
 
+import com.ecommerce.project.sb_ecom.com.ecommerce.project.exception.APIException;
+import com.ecommerce.project.sb_ecom.com.ecommerce.project.exception.ResourceNotFoundException;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.model.Category;
 import com.ecommerce.project.sb_ecom.com.ecommerce.project.repositories.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,25 +21,31 @@ public class CategoryServiceImp implements CategoryService{
     private CategoryRepository repository;
 
     private List<Category> categories = new ArrayList<>();
-    //private long catId = 1l;
 
     @Override
     public List<Category> getAllCategories() {
-        return repository.findAll();
+        List<Category> categoryList = repository.findAll();
+        if(categoryList.isEmpty())
+            throw new APIException("No categories available");
+        return categoryList;
+
     }
 
     @Override
     public String createNewCategory(Category category) {
-        //category.setCategoryId(catId++);
-        repository.save(category);
-        return "Category created successfully";
+        Category savedCategory = repository.findByCategoryName(category.getCategoryName());
+        if(savedCategory != null){
+            throw new APIException(category.getCategoryName()+ " already available");
+        }else
+            repository.save(category);
+            return "Category created successfully";
     }
 
     @Override
     public String deleteCategoryById(Long categoryId) {
 
         Category category= repository.findById(categoryId).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                orElseThrow(() -> new ResourceNotFoundException("Category","categoryId",categoryId));
 
         repository.delete(category);
 
@@ -48,7 +56,7 @@ public class CategoryServiceImp implements CategoryService{
     public Category updateCategoryById(Category category, Long categoryId) {
 
         long savedCategoryId = repository.findById(categoryId).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)).getCategoryId();
+                orElseThrow(() -> new ResourceNotFoundException("Category","categoryId",categoryId)).getCategoryId();
 
         category.setCategoryId(categoryId);
         return repository.save(category);
