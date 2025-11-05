@@ -61,4 +61,15 @@ public class ProductServiceImpl implements ProductService{
         return productResponse;
 
     }
+
+    @Override
+    public ProductResponse searchByKeyword(String keyword) {
+        List<Product> productsByKeyword = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%');
+        List<ProductDTO> productDTOList = productsByKeyword.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .toList();
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDTOList);
+        return productResponse;
+    }
 }
