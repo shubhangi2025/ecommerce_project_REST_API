@@ -28,6 +28,7 @@ public class Product {
     private double specialPrice;
     private String image;
     private double discount;
+    private boolean isHot;
 
     @ManyToOne
     @JoinColumn(name = "categoryId")
